@@ -83,13 +83,27 @@ float function1(float x, float e){
     return res;
 }
 
+void function2(float* x, float* e, float* result){
+    int n = 2;
+
+    float i = *x;
+
+    while(abs(i) >= *e){
+        *result += i;
+
+        i = (pow(*x, 2*n - 1))/(2.0*n - 1.0);
+
+        n++;
+    }
+}
+
 int main(){
-// Задание 4* под цифрой 1
-    float result;
+// Задание 4* под цифрой 2
+    float result = 0;
     float x = 0.2;
     float e = 0.5*pow(10,-4);
 
-    result = function1(x, e);
+    function2(&x, &e, &result);
     cout << result;
 // Конец задания 4* под цифрой 1
 
