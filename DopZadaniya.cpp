@@ -97,14 +97,37 @@ void function2(float* x, float* e, float* result){
     }
 }
 
-int main(){
-// Задание 4* под цифрой 2
-    float result = 0;
+float function3(float& x, float& e){
+    int n = 2;
+
+    float i = x;
+
+    float nl = 0;
+    float& result = nl;
+
+    while(abs(i) >= e){
+        result += i;
+
+        i = (pow(x, 2*n - 1))/(2.0*n - 1.0);
+
+        n++;
+    }
+
+    return result;
+}
+
+int main(){   
     float x = 0.2;
     float e = 0.5*pow(10,-4);
+    float result = function3(x,e);
 
-    function2(&x, &e, &result);
     cout << result;
+// Задание 4* под цифрой 3
+    
+// Задание 4* под цифрой 2
+    // float result = 0;
+    // function2(&x, &e, &result);
+    // cout << result;
 // Конец задания 4* под цифрой 1
 
 
