@@ -1,18 +1,14 @@
 #include <iostream>
 #include <string>
 #include <cctype>
+#include <fstream>
+
 using namespace std;
 
 struct timeap{
     int hour;
     int min;
     int sec;
-};
-
-enum class Type_Flight {
-    транзит,
-    стыковка,
-    чартер
 };
 
 struct airplane {
@@ -24,12 +20,16 @@ struct airplane {
 
     float cost;
 
-    // Только в конце понял, что тип полета можно было сделать перечислением
     string type_flight;
 
 };
 
+
 void print_flight(airplane &flight) {
+    /*Вывод информации объектра структуры airplane
+     * flight (airplane): объект структуры airplane
+     */
+
     cout << "----------------" << endl;
     cout << "Город назначения: " << flight.arrive_point << "; Стоимость: " << flight.cost << "; Тип полета: " << flight.type_flight << endl;
     cout << "Время отправки: " << flight.t_go.hour << ":" << flight.t_go.min << endl;
@@ -40,6 +40,14 @@ void print_flight(airplane &flight) {
 
 
 bool elem_is_ex(airplane arr[], int size, airplane elem){
+    /* Функция, проверяющая наличие объекта структуры airplane в базе данных
+     * arr[] (airplane): массив, в котором нужно найти объект
+     * size (int): размеронсть массива
+     * elem (airplane): объект, который нужно найти
+     *
+     * return: bool
+     */
+
     for(int i = 0; i < size; i++){
         if(arr[i].arrive_point == elem.arrive_point && arr[i].type_flight == elem.type_flight && 
         arr[i].cost == elem.cost && arr[i].t_trip.hour == elem.t_trip.hour && arr[i].t_trip.min == elem.t_trip.min && 
@@ -51,6 +59,12 @@ bool elem_is_ex(airplane arr[], int size, airplane elem){
 }
 
 void search_grad(airplane old_arr[], airplane new_arr[], int size){
+    /* заполняет новый массив объектами структуры airplane, в которых город оканчивается на "град".
+     * old_arr[] (airplane): массив, в котором нужно искать такие объекты
+     * new_arr[] (airplane): массив, который заполняется найденными объектами
+     * size (int): размерность двух массивов. В худшем случае new_arr[] заполнится всеми объектами из старого массива
+     */
+
     for(int i = 0; i < size; i++){
         for(int j = 0; j < size; j++){
             if(old_arr[j].arrive_point.find("град") != string::npos && old_arr[j].type_flight == "транзит" && !elem_is_ex(new_arr, size, old_arr[j])){
@@ -62,12 +76,25 @@ void search_grad(airplane old_arr[], airplane new_arr[], int size){
     cout << "Массив сформирован" << endl;
 }
 
-// Сравнение часов и минут для сортировки пузырьком в функции filt_time_arr
+
 bool compr(airplane a, airplane b){
+    /* Вспомогательная функция для сортировки методом пузырька. Сравнение часов и минут для сортировки пузырьком в функции filt_time_arr
+     * a (airplane): объект структуры airplane
+     * b (airplane): объект структуры airplane
+     *
+     * Returns:
+     *  bool
+     */
+
     return ((a.t_trip.hour < b.t_trip.hour) || ((a.t_trip.hour == b.t_trip.hour) && (a.t_trip.min < b.t_trip.min)));
 }
 
 void filt_time_arr(airplane arr[], int size_arr){
+    /* Сортировка пузырьком по времени полета
+     * arr[] (airplane): массив, который нужно отсортировать
+     * size_arr (int): размероность массива
+     */
+
     airplane p;
 
     for(int i = 0; i < size_arr; i++){
@@ -85,6 +112,11 @@ void filt_time_arr(airplane arr[], int size_arr){
 }
 
 void search_flight_by_name(airplane arr[], int size) {
+    /* Поиск рейса по месту посадки и времени оотправления
+     * arr[] (airplane): массив, в котором нужно найти
+     * size (int): размероность массива
+     */
+
     string point;
     int hour;
     int min;
@@ -102,9 +134,15 @@ void search_flight_by_name(airplane arr[], int size) {
             break;
         }
     }
+
+    cin.ignore(32767, '\n');
 }
 
 void print_flights_by_tt(airplane arr[], int size) {
+    /* Вывод полетов, которые вылетают в определенном диапазоне
+     * arr[] (airplane): массив, котором нужно найти
+     * size (int): размероность массива
+     */
     int hour1;
     int hour2;
     string type_fl;
@@ -128,23 +166,15 @@ void print_flights_by_tt(airplane arr[], int size) {
             break;
         }
     }
+
+    cin.ignore(32767, '\n');
 }
 
-void rename_flight(airplane &flight) {
+void calc_t_trip(airplane &flight) {
+    /* Вычисление времени полета
+     * &flight (airplane): ссылка на объект
+     */
 
-    cout << "Введите новый пункт назначения: ";
-    getline(cin, flight.arrive_point);
-
-    cout << "Введите тип полета: ";
-    getline(cin, flight.type_flight);
-
-    cout << "Введите время отправки в формате Ч:М:С: ";
-    scanf("%i:%i:%i", &flight.t_go.hour, &flight.t_go.min, &flight.t_go.sec);
-
-    cout << "Введите время прибытия: ";
-    scanf("%i:%i:%i", &flight.t_end.hour, &flight.t_end.min, &flight.t_end.sec);
-
-    // Вычисление времени полета
     if (flight.t_end.hour >= flight.t_go.hour) {
         flight.t_trip.hour = flight.t_end.hour - flight.t_go.hour;
     }
@@ -159,13 +189,41 @@ void rename_flight(airplane &flight) {
         flight.t_trip.hour--;
         flight.t_trip.min = 60 - flight.t_go.min + flight.t_end.min;
     }
+}
+
+void rename_flight(airplane &flight) {
+    /* Полное переназначение полета
+     * &flight (airplane): ссылка на объект
+     */
+
+    cout << "Введите новый пункт назначения: ";
+    getline(cin, flight.arrive_point);
+
+    cout << "Введите тип полета: ";
+    getline(cin, flight.type_flight);
+
+    cout << "Введите время отправки в формате Ч:М:С: ";
+    scanf("%i:%i:%i", &flight.t_go.hour, &flight.t_go.min, &flight.t_go.sec);
+
+    cout << "Введите время прибытия: ";
+    scanf("%i:%i:%i", &flight.t_end.hour, &flight.t_end.min, &flight.t_end.sec);
+
+    // Вычисление времени полета
+    calc_t_trip(flight);
 
     cout << "Введите цену: ";
     scanf("%f", &flight.cost);
 
+    cin.ignore(32767, '\n');
 }
 
 void search_flight_btc(airplane arr[], int size, airplane new_arr[]) {
+    /* Формирование нового массива с полетами, стоимость которых не превышает определенного значения
+     * arr[] (airplane): массив со всеми полетами
+     * new_arr[] (airplane): массив, который формируется
+     * size (int): размерность массивов
+     */
+
     string type_fl;
     cout << "Введите тип полета: ";
     getline(cin, type_fl);
@@ -176,14 +234,97 @@ void search_flight_btc(airplane arr[], int size, airplane new_arr[]) {
 
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-            if (arr[j].cost < cost_fl && arr[j].type_flight == type_fl && !elem_is_ex(new_arr, size, arr[j])) {
+            if (arr[j].cost <= cost_fl && arr[j].type_flight == type_fl && !elem_is_ex(new_arr, size, arr[j])) {
                 new_arr[i] = arr[j];
                 break;
             }
         }
     }
 
+    cin.ignore(32767, '\n');
+
     cout << "Массив сформирован (search_flight_btc)" << endl;
+}
+
+void rpl_typefl_from_file(string path, airplane arr[], int size) {
+    /* Замена типа полета через данные в файле
+     * path (string): путь к файлу
+     * arr[] (airplane): массив, в котором будут заменяться значения
+     * size (int): размерность массива
+     */
+
+    ifstream file;
+    file.open(path);
+
+    string line[3];
+
+    if (file.is_open()) {
+        while (!file.eof()) {
+            file >> line[0] >> line[1] >> line[2];
+
+            for (int i = 0; i < size; i++) {
+                if (line[0] == arr[i].arrive_point) {
+                    arr[i].type_flight = line[1];
+                }
+            }
+        }
+    }
+
+    file.close();
+    cout << "Корректировка типов полета выполнена." << endl;
+}
+
+void wr_bin_file(string path, airplane arr[], int size) {
+    /* Запись в бинарный файл */
+
+    ofstream file(path, ios::out | ios::binary);
+
+    if (file.is_open()) {
+        for (int i = 0; i < size; i++) {
+            size_t lenstring = arr[i].arrive_point.size();
+            file.write((char*)&lenstring, sizeof(lenstring));
+            file.write(arr[i].arrive_point.c_str(), lenstring);
+
+            file.write((char*)&arr[i].t_go, sizeof(timeap));
+            file.write((char*)&arr[i].t_end, sizeof(timeap));
+            file.write((char*)&arr[i].t_trip, sizeof(timeap));
+            file.write((char*)&arr[i].cost, sizeof(arr[i].cost));
+
+            size_t lenstring1 = arr[i].type_flight.size();
+            file.write((char*)&lenstring1, sizeof(lenstring1));
+            file.write(arr[i].type_flight.c_str(), lenstring1);
+        }
+    }
+    file.close();
+    cout << "Файл записан." << endl;
+}
+
+void rd_bin_file(string path, airplane arr[], int size) {
+    /* Чтение бинарного файла  */
+    fstream file(path, ios::in | ios::binary);
+
+    if (file.is_open()) {
+        for (int i = 0; i < size; i++) {
+            size_t lenstring;
+            file.read((char*)&lenstring, sizeof(lenstring));
+            arr[i].arrive_point.resize(lenstring);
+            file.read(&arr[i].arrive_point[0], lenstring);
+
+            file.read((char*)&arr[i].t_go, sizeof(timeap));
+            file.read((char*)&arr[i].t_end, sizeof(timeap));
+            file.read((char*)&arr[i].t_trip, sizeof(timeap));
+            file.read((char*)&arr[i].cost, sizeof(arr[i].cost));
+
+            size_t lenstring1;
+            file.read((char*)&lenstring1, sizeof(lenstring1));
+            arr[i].type_flight.resize(lenstring1);
+            file.read(&arr[i].type_flight[0], lenstring1);
+        }
+    }
+
+    file.close();
+    cout << "Файл прочитан." << endl;
+
 }
 
 int main(){
@@ -212,41 +353,79 @@ int main(){
     airplanes[18] = {"Екатеринбург", {11, 30, 0}, {13, 45, 0}, {2, 15, 0}, 6800.0, "чартер"};
     airplanes[19] = {"Кировград", {8, 0, 0}, {12, 20, 0}, {4, 20, 0}, 27500.0, "транзит"};
 
-    // filt_time_arr(airplanes, 20);
+    filt_time_arr(airplanes, 20);
 
-    // for(int i = 0; i < std::size(airplanes); i++){
-    //     cout << airplanes[i].arrive_point << " " << airplanes[i].t_trip.hour << ":" << airplanes[i].t_trip.min << ":" << airplanes[i].t_trip.sec << endl;
-    // }
+    for(int i = 0; i < std::size(airplanes); i++) {
+        print_flight(airplanes[i]);
+    }
 
-    // airplane new_flight[20];
-    // search_grad(airplanes, new_flight, 20);
-    // for(int i = 0; i < std::size(airplanes); i++){
-    //      cout << new_flight[i].arrive_point << " " << new_flight[i].t_trip.hour << ":" << new_flight[i].t_trip.min << ":" << new_flight[i].t_trip.sec << endl;
-    // }
-    // search_flight_by_name(airplanes, 20);
+    cout << "------------------------------------------------------------------" << endl;
 
-    // print_flights_by_tt(airplanes, 20);
+    airplane new_flight[20];
+    search_grad(airplanes, new_flight, 20);
+    for(int i = 0; i < std::size(airplanes); i++) {
+        print_flight(new_flight[i]);
+    }
 
-    // airplane airbus;
-    // airbus.arrive_point = "Москва";
-    // airbus.t_go.hour = 12;
-    // airbus.t_go.min = 0;
-    // airbus.t_go.sec = 0;
-    // airbus.t_end.hour = 13;
-    // airbus.t_end.min = 0;
-    // airbus.t_end.sec = 0;
-    // airbus.t_trip.hour = 1;
-    // airbus.t_trip.min = 0;
-    // airbus.t_trip.sec = 0;
-    // airbus.cost = 1000;
-    // airbus.type_flight = "транзит";
-    // print_flight(airbus);
+    cout << "------------------------------------------------------------------" << endl;
 
-    // search_flight_btc(airplanes, 20, new_flight);
-    // for(int i = 0; i < std::size(airplanes); i++){
-    //      cout << new_flight[i].arrive_point << " " << new_flight[i].t_trip.hour << ":" << new_flight[i].t_trip.min << ":" << new_flight[i].t_trip.sec << endl;
-    // }
     search_flight_by_name(airplanes, 20);
+
+    cout << "------------------------------------------------------------------" << endl;
+
+    print_flights_by_tt(airplanes, 20);
+
+    cout << "------------------------------------------------------------------" << endl;
+
+    airplane airbus;
+    airbus.arrive_point = "Москва";
+    airbus.t_go.hour = 12;
+    airbus.t_go.min = 0;
+    airbus.t_go.sec = 0;
+    airbus.t_end.hour = 13;
+    airbus.t_end.min = 0;
+    airbus.t_end.sec = 0;
+    airbus.t_trip.hour = 1;
+    airbus.t_trip.min = 0;
+    airbus.t_trip.sec = 0;
+    airbus.cost = 1000;
+    airbus.type_flight = "транзит";
+    rename_flight(airbus);
+    print_flight(airbus);
+
+    cout << "------------------------------------------------------------------" << endl;
+
+    search_flight_btc(airplanes, 20, new_flight);
+    for(int i = 0; i < std::size(airplanes); i++){
+        print_flight(new_flight[i]);
+    }
+
+    cout << "------------------------------------------------------------------" << endl;
+
+    search_flight_by_name(airplanes, 20);
+
+    cout << "------------------------------------------------------------------" << endl;
+
+    rpl_typefl_from_file("text.txt", airplanes, 20);
+
+    for (int i = 0; i < 20; i++) {
+        print_flight(airplanes[i]);
+    }
+
+    cout << "------------------------------------------------------------------" << endl;
+
+    wr_bin_file("C:\\Users\\Aleks\\OneDrive\\Desktop\\textbinary.txt", airplanes, 20);
+
+    airplane new_airplane[20];
+
+    cout << "------------------------------------------------------------------" << endl;
+
+    rd_bin_file("C:\\Users\\Aleks\\OneDrive\\Desktop\\textbinary.txt", new_airplane, 20);
+
+    for (int i = 0; i < 20; i++) {
+        print_flight(new_airplane[i]);
+    }
+
     system("pause");
     return 0;
 }
