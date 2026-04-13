@@ -414,13 +414,13 @@ int main(){
 
     cout << "------------------------------------------------------------------" << endl;
 
-    wr_bin_file("C:\\Users\\Aleks\\OneDrive\\Desktop\\textbinary.txt", airplanes, 20);
+    wr_bin_file("textbinary.txt", airplanes, 20);
 
     airplane new_airplane[20];
 
     cout << "------------------------------------------------------------------" << endl;
 
-    rd_bin_file("C:\\Users\\Aleks\\OneDrive\\Desktop\\textbinary.txt", new_airplane, 20);
+    rd_bin_file("textbinary.txt", new_airplane, 20);
 
     for (int i = 0; i < 20; i++) {
         print_flight(new_airplane[i]);
